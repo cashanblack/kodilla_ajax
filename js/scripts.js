@@ -15,50 +15,43 @@ $(function () {
 
 		// sprawdzenie na długosć
 		if (countryName.length < 2) {
-			alert("Prosze wpisac co najmniej 2 znaki w pole wyszukiwania");
-			return false // przerywamy funkcje...
+			return alert("Prosze wpisac co najmniej 2 znaki w pole wyszukiwania");
+			// znaczy tak ?
 		} else {
-			//
-			$.ajax({
-				url: url + countryName,
-				method: 'GET',
-				success: function (resp) {
-					// robie tak dziko bo chcem przekazać  countryName w
-					//parametrze
-					showCountriesList(resp, countryName);
-				},
-				statusCode: {
-					404: function () {
-						$countriesList.empty();
-						var $row = $('<li>').text('Brak danych');
-						$countriesList.append($row);
-					}
-				}
-
-			});
-			//
-		} //koniec else'a
+			getCountriesList(countryName)
+		}
 	}
 
+	// ajax'owe zapytanie do serwera
+	function getCountriesList(countryName) {
+		$.ajax({
+			url: url + countryName,
+			method: 'GET',
+			success: function (resp) {
+				showCountriesList(resp, countryName);
+			},
+			statusCode: {
+				404: function () {
+					$countriesList.empty();
+					var $row = $('<li>').text('Brak danych');
+					$countriesList.append($row);
+				}
+			}
+
+		});
+	}
 	// filtrowanie i wyświetlanie listy państw
 	function showCountriesList(resp, countryName) {
 		$countriesList.empty();
-		var posInResp = 0;
-		//
-		// a tu tak dziko aby w funkcji w filtrze wysłać aż 2 parametry
-		// komorke tabeli i pobrany country name...
-		// a wsztsko po to aby nuiknac ponownego pobrania
-		// 'countryName = $('#country-name').val();'
-		// nie wiem czy madrze :D.., ale wydawąło mi się że tak jest "bardziej :)...
 		globResp = resp.filter(function (tableCell) {
 				return reCheckName(tableCell.name, countryName)
-			});
-		//
-		globResp.forEach(function (item) {
-			var $row = $('<li>').text(item.name).attr("pos", posInResp);
-			$countriesList.append($row);
-			posInResp++;
-		})
+			}).forEach(function (item, posInResp) {
+				var $row = $('<li>').text(item.name).attr("pos", posInResp);
+				$countriesList.append($row);
+			})
+			// faktycznie, możn akorzystać z 2-giego parametru.. umkneło...
+			// chain'owanie - kurde strasznie źle mi się to czyta.
+			// mówisz ze to standard i wypada to łaczyć ?
 
 	}
 
